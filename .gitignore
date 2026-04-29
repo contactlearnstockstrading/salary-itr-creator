@@ -1,0 +1,25 @@
+# ── IDE ──────────────────────────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+
+# ── Java / Maven ─────────────────────────────────────────────────────────────
+backend/target/
+*.class
+*.jar
+*.war
+
+# ── Node / Frontend ───────────────────────────────────────────────────────────
+ui/node_modules/
+ui/dist/
+ui/.env
+ui/.env.local
+ui/.env.*.local
+
+# ── Playwright test artifacts ─────────────────────────────────────────────────
+ui/test-results/
+ui/playwright-report/
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
