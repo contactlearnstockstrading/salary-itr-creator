@@ -4,12 +4,14 @@ import RegimeComparison from './components/RegimeComparison'
 import TaxSummary from './components/TaxSummary'
 import Suggestions from './components/Suggestions'
 import DeductionBreakdown from './components/DeductionBreakdown'
+import Articles from './components/Articles'
 import { calculateTax } from './services/api'
 
 export default function App() {
   const [result, setResult]   = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState(null)
+  const [tab, setTab]         = useState('calculator')
 
   const handleCalculate = async (formData) => {
     setLoading(true)
@@ -48,8 +50,36 @@ export default function App() {
         </div>
       </header>
 
+      {/* ── Tab Bar ── */}
+      <div className="bg-white border-b border-slate-200 sticky top-[60px] z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex gap-1 py-2">
+            {[
+              { id: 'calculator', label: 'Calculator', icon: '📊' },
+              { id: 'articles',   label: 'Tax Guide',  icon: '📖' },
+            ].map(({ id, label, icon }) => (
+              <button
+                key={id}
+                onClick={() => setTab(id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  tab === id
+                    ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                <span>{icon}</span>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* ── Main ── */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {tab === 'articles' ? (
+          <Articles />
+        ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
 
           {/* Left – Input Form */}
@@ -95,6 +125,7 @@ export default function App() {
             )}
           </div>
         </div>
+        )}
       </main>
 
       {/* ── Footer ── */}
