@@ -53,4 +53,24 @@ public class TaxRequest {
 
     /** Total savings account interest from all banks (80TTA: exempt up to ₹10,000) */
     private double savingsInterest;
+
+    // ── Compliance / Interest Calculation Inputs ──────────────────────────────
+
+    /**
+     * Total TDS already deducted by employer for the financial year.
+     * Check Form 16 / Form 26AS for the exact amount.
+     */
+    private double tdsDeducted;
+
+    /**
+     * Any advance tax paid directly by the taxpayer (outside TDS).
+     * Assumed to be paid by 15th March for installment calculations.
+     */
+    private double advanceTaxPaid;
+
+    /**
+     * Number of months after the 31st July deadline that the ITR was/will be filed.
+     * 0 = filed on time. 1 = filed in August, 2 = September, etc.
+     */
+    private int monthsFilingDelay;
 }

@@ -5,13 +5,28 @@ import TaxSummary from './components/TaxSummary'
 import Suggestions from './components/Suggestions'
 import DeductionBreakdown from './components/DeductionBreakdown'
 import Articles from './components/Articles'
+import InterestPanel from './components/InterestPanel'
+import AuthPage from './components/AuthPage'
 import { calculateTax } from './services/api'
 
 export default function App() {
+  const [user, setUser]       = useState(() => {
+    try { return JSON.parse(localStorage.getItem('taxsmart_user')) } catch { return null }
+  })
   const [result, setResult]   = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState(null)
   const [tab, setTab]         = useState('calculator')
+
+  if (!user) {
+    return <AuthPage onAuth={setUser} />
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('taxsmart_user')
+    setUser(null)
+    setResult(null)
+  }
 
   const handleCalculate = async (formData) => {
     setLoading(true)
@@ -43,9 +58,24 @@ export default function App() {
               <p className="text-xs text-slate-400">Old Regime + New Regime · FY 2024-25 · CA-Grade Suggestions</p>
             </div>
           </div>
-          <div className="hidden sm:block text-right">
-            <p className="text-xs text-slate-400">Based on Indian IT Act</p>
-            <p className="text-xs text-orange-400 font-medium">Save More. File Smart.</p>
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:block text-right">
+              <p className="text-xs text-slate-400">Based on Indian IT Act</p>
+              <p className="text-xs text-orange-400 font-medium">Save More. File Smart.</p>
+            </div>
+            <div className="flex items-center gap-2 border-l border-slate-700 pl-3">
+              <div className="w-7 h-7 bg-orange-500 rounded-full flex items-center justify-center text-xs font-bold text-white select-none">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+              <span className="hidden sm:block text-sm text-slate-300">{user.name}</span>
+              <button
+                onClick={handleLogout}
+                className="text-xs text-slate-400 hover:text-white transition-colors ml-1"
+                title="Log out"
+              >
+                Sign out
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -120,6 +150,7 @@ export default function App() {
                 <RegimeComparison result={result} />
                 <TaxSummary result={result} />
                 <DeductionBreakdown breakdown={result.breakdown} />
+                <InterestPanel details={result.interestDetails} />
                 <Suggestions suggestions={result.suggestions} />
               </>
             )}

@@ -333,6 +333,234 @@ const ARTICLES = [
     ],
   },
   {
+    id: '234a',
+    icon: '📅',
+    tag: 'Section 234A',
+    title: 'Section 234A — Interest for Filing Your ITR Late',
+    oneLiner: 'Miss the filing deadline and the government charges 1% interest per month on your unpaid tax.',
+    body: [
+      {
+        heading: 'What triggers this interest?',
+        text: 'If you do not file your Income Tax Return (ITR) by the due date — typically 31st July for salaried individuals — Section 234A kicks in. You are charged 1% simple interest per month (or part of a month) on the tax amount that was unpaid as of the due date.',
+      },
+      {
+        heading: 'How the interest is calculated',
+        bullets: [
+          'Interest = 1% × (Tax due − TDS − Advance Tax paid) × No. of months delayed',
+          'Even one day into a new month counts as a full month',
+          'The clock starts from the original due date, not from when you get a notice',
+          'Interest stops when you actually pay the outstanding tax',
+        ],
+      },
+      {
+        heading: 'Which regime does this apply to?',
+        text: 'Section 234A applies equally under both Old and New Regime. It is a compliance rule, not a deduction rule. Your choice of regime has no effect on whether this interest applies — only whether you owe tax does.',
+      },
+      {
+        heading: 'How to avoid it completely',
+        bullets: [
+          'Ensure your employer deducts the correct TDS so you owe little or no tax at year end',
+          'Pay any remaining tax as Advance Tax by 15th March (4th installment)',
+          'File your ITR on time — 31st July for most salaried employees',
+          'If you expect to miss the deadline, pay the outstanding tax first — that stops the interest meter',
+        ],
+      },
+      {
+        heading: 'Optimisation tip',
+        text: 'Even if you cannot file the full ITR by July 31, paying the tax amount before the deadline stops 234A interest from accruing. The belated ITR can be filed later without additional 234A cost.',
+      },
+    ],
+    keyNumbers: [
+      { label: 'Interest rate', value: '1% per month (simple)' },
+      { label: 'Applies from', value: 'Day after due date' },
+      { label: 'Regime applicability', value: 'Both Old and New' },
+      { label: 'Filing due date (salaried)', value: '31st July' },
+    ],
+  },
+  {
+    id: '234b',
+    icon: '💸',
+    tag: 'Section 234B',
+    title: 'Section 234B — Interest for Not Paying Enough Advance Tax',
+    oneLiner: 'If you pay less than 90% of your tax liability as advance tax, you owe 1% interest on the shortfall.',
+    body: [
+      {
+        heading: 'What is advance tax?',
+        text: 'Advance tax is the tax you pay in installments during the financial year itself — not after the year ends. For salaried people, TDS deducted by your employer counts as advance tax. Problems arise when TDS is insufficient or you have other income (interest, capital gains, freelance) your employer does not know about.',
+      },
+      {
+        heading: 'The 90% rule',
+        text: 'By 31st March, you must have paid at least 90% of your total tax liability for the year (via TDS + advance tax payments). If you have paid less than 90%, Section 234B applies on the entire shortfall from 1st April to the date you actually pay.',
+      },
+      {
+        heading: 'How the interest is calculated',
+        bullets: [
+          'Interest = 1% × (Assessed Tax − TDS − Advance Tax paid) × Months from 1st April to payment',
+          'Assessed tax = tax on total income including all sources',
+          'TDS by employer is automatically credited — check Form 26AS to confirm',
+          'Applies even if you later file ITR and get a refund — the interest clock ran during the year',
+        ],
+      },
+      {
+        heading: 'Which regime does this apply to?',
+        text: 'Both Old and New Regime equally. However, choosing the right regime reduces your actual tax liability, which reduces the base on which 234B interest is calculated. A smaller tax bill means smaller 234B exposure.',
+      },
+      {
+        heading: 'How to minimise or avoid it',
+        bullets: [
+          'Declare other income sources (FD interest, rent, freelance) to your employer so they deduct correct TDS',
+          'If TDS is insufficient, pay advance tax by 15th March to cover the gap',
+          'Use the tax calculator to estimate your total liability early in the year (April–June)',
+          'Check Form 26AS in July to reconcile actual TDS credited vs expected',
+        ],
+      },
+    ],
+    keyNumbers: [
+      { label: 'Threshold to avoid', value: 'Pay ≥ 90% by 31st March' },
+      { label: 'Interest rate', value: '1% per month (simple)' },
+      { label: 'Regime applicability', value: 'Both Old and New' },
+      { label: 'Starts from', value: '1st April of assessment year' },
+    ],
+  },
+  {
+    id: '234c',
+    icon: '📆',
+    tag: 'Section 234C',
+    title: 'Section 234C — Interest for Missing Advance Tax Installments',
+    oneLiner: 'Advance tax must be paid in 4 installments during the year — miss a deadline and interest applies.',
+    body: [
+      {
+        heading: 'The 4 installment schedule',
+        bullets: [
+          '15th June — 15% of estimated annual tax',
+          '15th September — 45% of estimated annual tax (cumulative)',
+          '15th December — 75% of estimated annual tax (cumulative)',
+          '15th March — 100% of estimated annual tax',
+        ],
+      },
+      {
+        heading: 'How 234C interest works',
+        text: 'If you pay less than the required percentage at any installment date, you pay 1% interest for 3 months on the shortfall. The last installment (March 15) attracts 1% for 1 month if short. Unlike 234A and 234B, this interest is installment-specific — you can be penalised for an early installment even if you pay 100% by year end.',
+      },
+      {
+        heading: 'Special rule for capital gains and one-time income',
+        text: 'If you received unexpected capital gains or dividend income after 15th September, you are not penalised for the earlier installments being short on that income. You are expected to true-up from the next installment onward. This is an important relief for stock market gains.',
+      },
+      {
+        heading: 'Which regime does this apply to?',
+        text: 'Both Old and New Regime equally. However, in New Regime your deductions are fewer and therefore your taxable income may be more predictable — making it easier to estimate installments correctly without underpaying.',
+      },
+      {
+        heading: 'How to optimise',
+        bullets: [
+          'Run a mid-year tax estimate in April and June — our calculator can help',
+          'If you have variable income (bonuses, freelance, capital gains), recalculate before each deadline',
+          'Salaried employees with only salary income and full TDS have zero advance tax obligation',
+          'Pay slightly more than required at each installment to avoid borderline shortfalls',
+        ],
+      },
+    ],
+    keyNumbers: [
+      { label: 'Interest rate per installment', value: '1% × 3 months on shortfall' },
+      { label: 'First installment', value: '15% by 15th June' },
+      { label: 'Regime applicability', value: 'Both Old and New' },
+      { label: 'Not applicable when', value: 'Full TDS by employer covers 100%' },
+    ],
+  },
+  {
+    id: '220',
+    icon: '📬',
+    tag: 'Section 220',
+    title: 'Section 220 — Tax Demand Notice and Interest on Default',
+    oneLiner: 'When the tax department sends you a demand notice, you have 30 days to pay — or 1% monthly interest kicks in.',
+    body: [
+      {
+        heading: 'When does a demand notice arrive?',
+        text: 'After you file your ITR, the Income Tax department processes it. If they find a mismatch — perhaps TDS credit missing in 26AS, income declared incorrectly, or a deduction disallowed — they raise a demand under Section 156. Section 220 governs the interest that accrues if you do not pay this demand on time.',
+      },
+      {
+        heading: 'The 30-day rule',
+        text: 'Once a demand notice is issued, you have 30 days to pay. If you do not pay within 30 days, you are treated as an "assessee in default" and 1% simple interest per month applies on the outstanding demand from the date of the notice.',
+      },
+      {
+        heading: 'Common reasons for demand notices',
+        bullets: [
+          'TDS mismatch — your Form 26AS shows less TDS than you claimed in ITR',
+          'Income omitted — interest income, dividends, or freelance income not declared',
+          'Deduction disallowed — 80C or 80D claim rejected due to missing proof',
+          'Wrong regime computation — switching regimes incorrectly at filing vs employer',
+          'Processing errors — CPC processes ITR slightly differently than your computation',
+        ],
+      },
+      {
+        heading: 'Which regime does this apply to?',
+        text: 'Both Old and New Regime. The regime you choose affects what deductions are allowed — and a disallowed deduction in Old Regime (e.g., 80C not accepted) can trigger a demand. New Regime has fewer deductions to verify, so the risk of a deduction-related demand is lower.',
+      },
+      {
+        heading: 'How to avoid and handle it',
+        bullets: [
+          'Always reconcile Form 26AS before filing — TDS shown there is what the department sees',
+          'Declare ALL income sources, not just salary — even ₹100 FD interest',
+          'If you receive a demand, respond within 30 days — either pay or file a rectification/appeal',
+          'For incorrect demands, file online rectification at incometax.gov.in under e-Proceedings',
+          'Keep investment proofs (80C, 80D) for at least 7 years after filing',
+        ],
+      },
+    ],
+    keyNumbers: [
+      { label: 'Pay within', value: '30 days of demand notice' },
+      { label: 'Interest if defaulted', value: '1% per month (Section 220(2))' },
+      { label: 'Regime applicability', value: 'Both Old and New' },
+      { label: 'Respond online at', value: 'incometax.gov.in → e-Proceedings' },
+    ],
+  },
+  {
+    id: '244a',
+    icon: '💰',
+    tag: 'Section 244A',
+    title: 'Section 244A — You Earn Interest When the Government Owes You a Refund',
+    oneLiner: 'If the IT department delays your refund, they pay you 6% annual interest on the amount owed.',
+    body: [
+      {
+        heading: 'This one works in your favour',
+        text: 'Unlike 234A, 234B, and 234C which charge you interest, Section 244A is the government paying interest to you. If your TDS deducted or advance tax paid exceeds your actual tax liability, you are entitled to a refund — and if the government takes time to process it, they owe you interest.',
+      },
+      {
+        heading: 'When does 244A interest apply?',
+        bullets: [
+          'Your refund is more than 10% of your total tax liability for the year',
+          'The refund arises from excess TDS or advance tax paid',
+          'Interest accrues from 1st April of the assessment year to the date the refund is granted',
+          'If the delay is your fault (late filing), interest starts from the date you filed, not 1st April',
+        ],
+      },
+      {
+        heading: 'How much interest do you earn?',
+        text: 'The rate is 6% per annum (0.5% per month), simple interest. On a ₹1,00,000 refund delayed by 6 months, you would earn ₹3,000 in interest. This is taxable income in the year you receive it — declare it under "Income from Other Sources."',
+      },
+      {
+        heading: 'Which regime does this apply to?',
+        text: 'Both Old and New Regime. In fact, New Regime users with lower deductions may sometimes have slightly less over-deduction risk — but anyone who paid excess TDS or advance tax is entitled to this interest regardless of regime.',
+      },
+      {
+        heading: 'Optimisation tips',
+        bullets: [
+          'File your ITR early (April–June) — refunds for early filers are processed faster',
+          'Ensure your bank account is pre-validated on incometax.gov.in for instant credit',
+          'If refund has not arrived in 3 months, raise a refund reissue request on the portal',
+          'Track refund status at tin.tin.nsdl.com or directly in the IT portal under e-Filing → Refund Status',
+          'Do not over-invest in TDS just to get a refund — you lose liquidity and only gain 6% interest',
+        ],
+      },
+    ],
+    keyNumbers: [
+      { label: 'Interest rate (in your favour)', value: '6% per annum (0.5%/month)' },
+      { label: 'Starts from', value: '1st April (if filed on time)' },
+      { label: 'Regime applicability', value: 'Both Old and New' },
+      { label: 'Refund interest is', value: 'Taxable income' },
+    ],
+  },
+  {
     id: 'surcharge',
     icon: '⚠️',
     tag: 'Surcharge',

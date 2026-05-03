@@ -1,16 +1,19 @@
 import { useState } from 'react'
 
 const INITIAL = {
-  grossSalary:    '',
-  basicSalary:    '',
-  hraReceived:    '',
-  ltaReceived:    '',
-  rentPaid:       '',
-  metro:          true,
-  section80C:     '',
-  section80CCD1B: '',
-  section80CCD2:  '',
-  savingsInterest:'',
+  grossSalary:       '',
+  basicSalary:       '',
+  hraReceived:       '',
+  ltaReceived:       '',
+  rentPaid:          '',
+  metro:             true,
+  section80C:        '',
+  section80CCD1B:    '',
+  section80CCD2:     '',
+  savingsInterest:   '',
+  tdsDeducted:       '',
+  advanceTaxPaid:    '',
+  monthsFilingDelay: '0',
 }
 
 function Field({ label, name, value, onChange, placeholder, helper }) {
@@ -57,16 +60,19 @@ export default function InputForm({ onSubmit, loading }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     onSubmit({
-      grossSalary:    parseFloat(form.grossSalary)    || 0,
-      basicSalary:    parseFloat(form.basicSalary)    || 0,
-      hraReceived:    parseFloat(form.hraReceived)    || 0,
-      ltaReceived:    parseFloat(form.ltaReceived)    || 0,
-      rentPaid:       parseFloat(form.rentPaid)       || 0,
-      metro:          form.metro,
-      section80C:     parseFloat(form.section80C)     || 0,
-      section80CCD1B: parseFloat(form.section80CCD1B) || 0,
-      section80CCD2:  parseFloat(form.section80CCD2)  || 0,
-      savingsInterest:parseFloat(form.savingsInterest)|| 0,
+      grossSalary:       parseFloat(form.grossSalary)       || 0,
+      basicSalary:       parseFloat(form.basicSalary)       || 0,
+      hraReceived:       parseFloat(form.hraReceived)       || 0,
+      ltaReceived:       parseFloat(form.ltaReceived)       || 0,
+      rentPaid:          parseFloat(form.rentPaid)          || 0,
+      metro:             form.metro,
+      section80C:        parseFloat(form.section80C)        || 0,
+      section80CCD1B:    parseFloat(form.section80CCD1B)    || 0,
+      section80CCD2:     parseFloat(form.section80CCD2)     || 0,
+      savingsInterest:   parseFloat(form.savingsInterest)   || 0,
+      tdsDeducted:       parseFloat(form.tdsDeducted)       || 0,
+      advanceTaxPaid:    parseFloat(form.advanceTaxPaid)    || 0,
+      monthsFilingDelay: parseInt(form.monthsFilingDelay)   || 0,
     })
   }
 
@@ -191,6 +197,58 @@ export default function InputForm({ onSubmit, loading }) {
           placeholder="e.g. 5000"
           helper="Interest from all savings bank accounts — exempt up to ₹10,000 under 80TTA"
         />
+      </Section>
+
+      {/* ── Tax Payments & Compliance ── */}
+      <Section icon="📋" title="Tax Payments & Compliance">
+        <div className="grid grid-cols-2 gap-3">
+          <Field
+            label="TDS Deducted by Employer"
+            name="tdsDeducted"
+            value={form.tdsDeducted}
+            onChange={handleChange}
+            placeholder="e.g. 120000"
+            helper="From Form 16 / Form 26AS (annual)"
+          />
+          <Field
+            label="Advance Tax Paid"
+            name="advanceTaxPaid"
+            value={form.advanceTaxPaid}
+            onChange={handleChange}
+            placeholder="e.g. 0"
+            helper="Any self-paid advance tax (outside TDS)"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            Filing Delay (months after 31 July)
+          </label>
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { label: 'On Time', sub: '≤ Jul 31', value: '0' },
+              { label: '1 Month', sub: 'Aug',      value: '1' },
+              { label: '2 Months', sub: 'Sep',     value: '2' },
+              { label: '3+ Months', sub: 'Oct+',   value: '3' },
+            ].map(({ label, sub, value }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setForm(p => ({ ...p, monthsFilingDelay: value }))}
+                className={`py-2 px-2 rounded-lg text-xs font-medium border-2 transition-all text-center ${
+                  form.monthsFilingDelay === value
+                    ? 'border-orange-500 bg-orange-50 text-orange-700'
+                    : 'border-slate-200 text-slate-500 hover:border-slate-300'
+                }`}
+              >
+                {label}
+                <span className="block text-[10px] font-normal mt-0.5 opacity-70">{sub}</span>
+              </button>
+            ))}
+          </div>
+          <p className="mt-1.5 text-xs text-slate-400">
+            Affects Section 234A interest calculation on any unpaid tax
+          </p>
+        </div>
       </Section>
 
       {/* ── Submit ── */}

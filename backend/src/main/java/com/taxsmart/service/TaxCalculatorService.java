@@ -107,6 +107,11 @@ public class TaxCalculatorService {
 
         String recommendedRegime = newEstimatedTax < estimatedTax ? "NEW" : "OLD";
 
+        // --- Step 7: Interest liability (234A / 234B / 234C / 244A) ---
+        // Use the recommended regime's tax as the base for compliance calculations
+        long taxForCompliance = recommendedRegime.equals("NEW") ? newEstimatedTax : estimatedTax;
+        TaxResponse.InterestDetails interestDetails = computeInterestLiability(req, taxForCompliance);
+
         return TaxResponse.builder()
                 .taxableIncome(taxableIncome)
                 .totalDeductions(totalDeductions)
@@ -122,6 +127,7 @@ public class TaxCalculatorService {
                 .newRegimeBreakdown(newBreakdown)
                 .newRegimeSuggestions(newSuggestions)
                 .recommendedRegime(recommendedRegime)
+                .interestDetails(interestDetails)
                 .build();
     }
 
@@ -509,6 +515,153 @@ public class TaxCalculatorService {
         }
 
         return list;
+    }
+
+    // ── Interest liability (234A / 234B / 234C / 244A) ───────────────────────
+
+    /**
+     * Computes interest and compliance status based on actual payments vs liability.
+     *
+     * ASSUMPTIONS (to keep inputs minimal):
+     *  - TDS is deducted uniformly across 12 months.
+     *  - Any extra advance tax paid by the user is treated as paid on 15th March
+     *    (worst case for 234C installment timing).
+     *  - 234B interest runs from 1st April to the filing date.
+     *    Filing date = July 31 + monthsFilingDelay months.
+     */
+    TaxResponse.InterestDetails computeInterestLiability(TaxRequest req, long totalTax) {
+        long tds         = (long) req.getTdsDeducted();
+        long advanceTax  = (long) req.getAdvanceTaxPaid();
+        int  delay       = req.getMonthsFilingDelay();
+
+        long totalPaid  = tds + advanceTax;
+        long netUnpaid  = Math.max(0L, totalTax - totalPaid);
+        long refund     = Math.max(0L, totalPaid - totalTax);
+
+        // ── 234A: Late filing interest ────────────────────────────────────────
+        // 1% per month on unpaid tax, for each month (or part month) after July 31.
+        long interest234A = 0;
+        if (delay > 0 && netUnpaid > 0) {
+            interest234A = Math.round(netUnpaid * 0.01 * delay);
+        }
+
+        // ── 234B: Insufficient advance tax ────────────────────────────────────
+        // Applies when (TDS + advance tax paid) < 90% of total tax liability by March 31.
+        // Interest runs from 1st April to the date of payment (i.e. filing date).
+        long   threshold90  = Math.round(totalTax * 0.90);
+        boolean applicable234B = totalPaid < threshold90;
+        long   interest234B = 0;
+        if (applicable234B && totalTax > 0) {
+            long shortfall234B = totalTax - totalPaid;
+            // April to July = 4 months base; add filing delay on top
+            int months234B = 4 + delay;
+            interest234B = Math.round(shortfall234B * 0.01 * months234B);
+        }
+
+        // ── 234C: Installment shortfalls ──────────────────────────────────────
+        // TDS assumed uniform. Advance tax assumed paid on 15th March.
+        // Installments:
+        //   15-Jun : cumulative 15% required
+        //   15-Sep : cumulative 45% required
+        //   15-Dec : cumulative 75% required
+        //   15-Mar : cumulative 100% required
+        double monthlyTDS = tds / 12.0;
+
+        record Installment(String date, int requiredPct, double tdsMonths, boolean includeAdvance) {}
+        List<Installment> schedule = List.of(
+                new Installment("15 Jun", 15,  2.5,  false),
+                new Installment("15 Sep", 45,  5.5,  false),
+                new Installment("15 Dec", 75,  8.5,  false),
+                new Installment("15 Mar", 100, 11.5, true)
+        );
+
+        long interest234C = 0;
+        boolean applicable234C = false;
+        List<TaxResponse.InstallmentDetail> breakdown234C = new ArrayList<>();
+
+        for (Installment inst : schedule) {
+            long paidByDate = Math.round(monthlyTDS * inst.tdsMonths())
+                    + (inst.includeAdvance() ? advanceTax : 0L);
+            long required   = Math.round(totalTax * (inst.requiredPct() / 100.0));
+            long shortfall  = Math.max(0L, required - paidByDate);
+            // Last installment: 1 month interest; others: 3 months
+            int months = inst.requiredPct() == 100 ? 1 : 3;
+            long instInterest = Math.round(shortfall * 0.01 * months);
+            interest234C += instInterest;
+            if (instInterest > 0) applicable234C = true;
+
+            breakdown234C.add(TaxResponse.InstallmentDetail.builder()
+                    .date(inst.date())
+                    .requiredPercent(inst.requiredPct())
+                    .requiredAmount(required)
+                    .paidByDate(paidByDate)
+                    .shortfall(shortfall)
+                    .interest(instInterest)
+                    .build());
+        }
+
+        // ── 244A: Refund interest (government pays YOU) ───────────────────────
+        // 0.5% per month on the refund amount.
+        // If filed on time: refund interest starts April 1 → typically 3 months to process.
+        // If filed late: interest starts from the filing date.
+        long refundInterest244A = 0;
+        if (refund > 0) {
+            int refundMonths = delay == 0 ? 3 : Math.max(1, 3 - delay);
+            refundInterest244A = Math.round(refund * 0.005 * refundMonths);
+        }
+
+        // ── Totals & status ───────────────────────────────────────────────────
+        long totalBurden = interest234A + interest234B + interest234C;
+        String status = totalBurden == 0 ? "SAFE"
+                : totalBurden < 5_000   ? "WARNING"
+                : "CRITICAL";
+
+        // ── Action items ──────────────────────────────────────────────────────
+        List<String> actions = new ArrayList<>();
+        if (totalTax == 0) {
+            actions.add("No tax liability this year — no interest sections apply to you.");
+        } else {
+            if (applicable234B || applicable234C) {
+                actions.add("Inform your employer about all income sources (FD interest, freelance, capital gains) so they deduct correct TDS and cover all installments.");
+                long remaining = totalTax - totalPaid;
+                if (remaining > 0) {
+                    actions.add("Pay " + inr(remaining) + " as advance tax immediately to stop 234B/234C interest accumulating further.");
+                }
+            }
+            if (delay > 0 && netUnpaid > 0) {
+                actions.add("File your ITR as soon as possible — each additional month adds " + inr(Math.round(netUnpaid * 0.01)) + " in 234A interest.");
+            } else if (delay == 0) {
+                actions.add("File on time by 31st July to avoid 234A interest on any unpaid balance.");
+            }
+            if (refund > 0) {
+                actions.add("File early (April–June) — refund interest under 244A starts from 1st April when you file on time.");
+                actions.add("Pre-validate your bank account on incometax.gov.in for instant refund credit.");
+            }
+            if (totalBurden == 0 && refund == 0 && netUnpaid == 0) {
+                actions.add("Your TDS fully covers your tax liability — no interest sections applicable.");
+                actions.add("File on time to avoid 234A and close out the year cleanly.");
+            }
+        }
+
+        return TaxResponse.InterestDetails.builder()
+                .tdsDeducted(tds)
+                .advanceTaxPaid(advanceTax)
+                .totalTaxPaid(totalPaid)
+                .netTaxPayable(netUnpaid)
+                .refundAmount(refund)
+                .interest234A(interest234A)
+                .monthsFilingDelay(delay)
+                .interest234B(interest234B)
+                .applicable234B(applicable234B)
+                .threshold90Percent(threshold90)
+                .interest234C(interest234C)
+                .applicable234C(applicable234C)
+                .refundInterest244A(refundInterest244A)
+                .totalInterestBurden(totalBurden)
+                .complianceStatus(status)
+                .actionItems(actions)
+                .installmentBreakdown(breakdown234C)
+                .build();
     }
 
     // ── Formatting helper ─────────────────────────────────────────────────────
